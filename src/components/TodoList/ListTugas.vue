@@ -1,6 +1,6 @@
 <template>
     <v-main class="list">
-        <h3 class="text-h3 font-weight-medium mb-5">To Do List UGD</h3>
+        <h3 class="text-h3 font-weight-medium mb-5">To Do List Tugas</h3>
 
         <v-card>
             <v-card-title>
@@ -41,17 +41,32 @@
                 </template>
 
                 <template v-slot:[`item.actions`]="{ item }">
-                    <v-btn small class="mr-2" @click="editItem(item)">
-                        edit
-                    </v-btn>
-                    <v-btn small @click="deleteItem(item)">
-                        delete
-                    </v-btn>
+                    <v-icon small class="mr-2" @click="dialog=true, editItem(item)" color="blue">
+                        mdi-pencil
+                    </v-icon>
+                    <v-icon small @click="deleteItem(item)" color="red">
+                        mdi-trash-can-outline
+                    </v-icon>
 
+                </template>
+                <template v-slot:[`item.checkbox`]="{ item }">
+                    <input type="checkbox" @change="checking($event, item)">
                 </template>
             </v-data-table>
         </v-card>
+        <br>
+        <v-card>
+                <ul v-for="(data, index) in check" :key="index">
+                    <li>
+                        {{ data.task }}
+                    </li>
+                </ul>
+                <v-card-title>
 
+                    <v-btn v-if="check.length" @click="deleteAll()">Delete All</v-btn>
+
+                </v-card-title>
+        </v-card>
 <v-dialog v-model="history" >
         
 
@@ -67,7 +82,7 @@
                 <v-spacer></v-spacer>
             </v-card-title>
 
-            <v-data-table :headers="headers2" :items="ftodos" :search="search">
+            <v-data-table :headers="headersToDo" :items="ftodos" :search="search">
                 <template v-slot:[`item.priority`]="{ item }">
                         <td>
                             <v-card v-if="item.priority == 'Penting'" style="border-color: lightcoral; color: lightcoral; width: fit-content;" outlined>
@@ -226,9 +241,11 @@ export default {
             dialogdel: false,
             dialognote: false,
             history: false,
-    
-            
 
+            //untuk checkboxnya
+            check: [],
+            checkbox: false,
+            
             filters: {
                 search: '',
                 priority: '',
@@ -259,9 +276,16 @@ export default {
                     value: "actions", 
                     sortable: false,
                 },
+
+                
+                {   
+                    text: "", 
+                    value: "checkbox"
+                
+                },
             ],
 
-            headers2: [
+            headersToDo: [
                {
                     text: "Task",
                     align: "start",
@@ -292,11 +316,13 @@ export default {
                     priority: "Penting",
                     note: "huffttt",
                 },
+
                 {
                     task: "nongkrong",
                     priority: "Tidak penting",
                     note: "bersama tman2",
                 },
+
                 {
                     task: "masak",
                     priority: "Biasa",
@@ -379,6 +405,27 @@ export default {
                 note: null,
             };
         },
+
+        deleteAll() {
+        var i  ;
+        
+        for(i in this.check){
+            this.ftodos.push(this.check[i])
+            this.todos.splice(this.check[i], 1)
+        }
+        this.check = []
+   },
+
+
+   checking(event, item) {
+       this.edititem= item;
+      if (event.target.checked){
+          this.check.push(item)
+      } else {
+        this.check.splice(this.check.indexOf(item), 1)
+      }
+   }
+
     },
 };
 </script>
